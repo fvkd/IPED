@@ -69,13 +69,23 @@ public class PluginConfig extends AbstractPropertiesConfigurable {
         }
 
         tskJarPath = properties.getProperty("tskJarPath"); //$NON-NLS-1$
-        if (tskJarPath != null && !tskJarPath.isEmpty())
+        if (tskJarPath != null && !tskJarPath.isEmpty()) {
             tskJarPath = tskJarPath.trim();
-        else if (!SystemUtils.IS_OS_WINDOWS) {
-            throw new IPEDException("You must set tskJarPath on LocalConfig.txt!"); //$NON-NLS-1$
+        } else {
+            // Fallback to system property
+            String sysPropPath = System.getProperty("iped.tsk.jar.path");
+            if (sysPropPath != null && !sysPropPath.isEmpty()) {
+                tskJarPath = sysPropPath.trim();
+            }
         }
-        if (!SystemUtils.IS_OS_WINDOWS && !new File(tskJarPath).exists()) {
-            throw new IPEDException("File not found " + tskJarPath + ". Set tskJarPath on LocalConfig.txt!"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        if (!SystemUtils.IS_OS_WINDOWS) {
+            if (tskJarPath == null || tskJarPath.isEmpty()) {
+                throw new IPEDException("You must set tskJarPath on LocalConfig.txt or -Diped.tsk.jar.path system property!"); //$NON-NLS-1$
+            }
+            if (!new File(tskJarPath).exists()) {
+                throw new IPEDException("File not found " + tskJarPath + ". Set tskJarPath on LocalConfig.txt!"); //$NON-NLS-1$ //$NON-NLS-2$
+            }
         }
     }
 
