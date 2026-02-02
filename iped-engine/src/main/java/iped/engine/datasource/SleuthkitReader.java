@@ -385,7 +385,7 @@ public class SleuthkitReader extends DataSourceReader {
             if (range != null && args.isContinue()) {
                 synchronized (idRangeMap) {
                     idRangeMap.put(image, range);
-                    idRangeMap.notify();
+                    idRangeMap.notifyAll();
                 }
             } else if (image.getName().equals(DB_NAME)) {
                 firstId = 0L;
@@ -394,7 +394,7 @@ public class SleuthkitReader extends DataSourceReader {
                 synchronized (idRangeMap) {
                     Long[] ids = { firstId, lastId };
                     idRangeMap.put(image, ids);
-                    idRangeMap.notify();
+                    idRangeMap.notifyAll();
                 }
             } else {
 
@@ -417,7 +417,7 @@ public class SleuthkitReader extends DataSourceReader {
                 synchronized (idRangeMap) {
                     Long[] ids = { firstId, null };
                     idRangeMap.put(image, ids);
-                    idRangeMap.notify();
+                    idRangeMap.notifyAll();
                 }
 
                 addImage = sleuthCase.makeAddImageProcess(timezone, true, false, "");
@@ -642,7 +642,7 @@ public class SleuthkitReader extends DataSourceReader {
         synchronized (idRangeMap) {
             Long[] ids = { firstId, lastId };
             idRangeMap.put(image, ids);
-            idRangeMap.notify();
+            idRangeMap.notifyAll();
         }
     }
 
@@ -684,7 +684,11 @@ public class SleuthkitReader extends DataSourceReader {
             }
 
             if (startId > endId) {
-                Thread.sleep(1000);
+                synchronized (idRangeMap) {
+                    if (idRangeMap.get(file)[1] == null) {
+                        idRangeMap.wait(1000);
+                    }
+                }
                 continue;
             }
             if (endId - startId > 100000) {
