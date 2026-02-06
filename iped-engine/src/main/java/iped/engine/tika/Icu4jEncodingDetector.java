@@ -6,6 +6,9 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MediaType;
 import org.apache.tika.parser.txt.CharsetDetector;
@@ -24,6 +27,8 @@ public class Icu4jEncodingDetector extends org.apache.tika.parser.txt.Icu4jEncod
      * 
      */
     private static final long serialVersionUID = 1L;
+
+    private static final Logger logger = LoggerFactory.getLogger(Icu4jEncodingDetector.class);
 
     static final int markLimit = 12000; // This is a Tika modification; ICU's is 8000
 
@@ -51,7 +56,7 @@ public class Icu4jEncodingDetector extends org.apache.tika.parser.txt.Icu4jEncod
             if (cleaned != null) {
                 detector.setDeclaredEncoding(cleaned);
             } else {
-                // TODO: log a warning?
+                logger.warn("Invalid declared encoding: {}", incomingCharset);
             }
         }
 
