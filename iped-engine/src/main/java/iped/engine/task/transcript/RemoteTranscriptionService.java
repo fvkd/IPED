@@ -603,10 +603,16 @@ public class RemoteTranscriptionService {
                     }
                     if (empty) {
                         try {
+                            if (executor.isShutdown()) {
+                                break;
+                            }
                             Thread.sleep(100);
 
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            break;
                         } catch (Exception e) {
-                            // TODO: handle exception
+                            logger.warn("Exception in transcription loop", e);
                         }
                         continue;
                     }
