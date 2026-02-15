@@ -495,11 +495,12 @@ public class Extractor {
                         // List<PhotoData> photo = d.getPhotoData();
                         if (cont.getAvatar() != null && !cont.getPhotos().isEmpty()) {
                             try {
-                                if (cont.getPhone() != null)
+                                if (cont.getPhone() != null) {
                                     searchAvatarFileName(cont, cont.getPhotos());
+                                }
                             } catch (IOException e) {
-                                // TODO: handle exception
-                                e.printStackTrace();
+                                logger.error("Error searching avatar for contact {}: {}", cont.getId(), e.getMessage());
+                                logger.debug(e.getMessage(), e);
                             }
                         }
                     }
@@ -534,11 +535,12 @@ public class Extractor {
                         // List<PhotoData> photo = d.getPhotoData();
                         if (cont.getAvatar() != null && !cont.getPhotos().isEmpty()) {
                             try {
-                                if (cont.getPhone() != null)
+                                if (cont.getPhone() != null) {
                                     searchAvatarFileName(cont, cont.getPhotos());
+                                }
                             } catch (IOException e) {
-                                // TODO: handle exception
-                                e.printStackTrace();
+                                logger.error("Error searching avatar for contact {}: {}", cont.getId(), e.getMessage());
+                                logger.debug(e.getMessage(), e);
                             }
                         }
                     }
