@@ -864,7 +864,7 @@ public class MetadataUtil {
         int pos = 0;
         boolean upper = true;
         for (int i = 0; i < chars.length; i++) {
-            Character c = chars[i];
+            char c = chars[i];
             if (Character.isLetterOrDigit(c)) {
                 if (upper) {
                     c = Character.toUpperCase(c);
