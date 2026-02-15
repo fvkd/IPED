@@ -188,7 +188,7 @@ public class PackageParser extends AbstractParser {
         boolean isCarved = nameKey != null ? nameKey.startsWith("Carved") : false; //$NON-NLS-1$
         BooleanWrapper encrypted = new BooleanWrapper();
         HashSet<String> parentMap = new HashSet<>();
-        ArrayList<String> zipSubitemList = new ArrayList<>();
+        HashSet<String> zipSubitemList = new HashSet<>();
         try {
             ArchiveEntry entry = ais.getNextEntry();
             while (entry != null) {
@@ -226,7 +226,7 @@ public class PackageParser extends AbstractParser {
     }
 
     private void handleEntry(EntryInputStreamFactory factory, ArchiveEntry entry, boolean isCarved,
-            BooleanWrapper encrypted, HashSet<String> parentMap, List<String> zipSubitemList, ParseContext context,
+            BooleanWrapper encrypted, HashSet<String> parentMap, Set<String> zipSubitemList, ParseContext context,
             EmbeddedDocumentExtractor extractor, XHTMLContentHandler xhtml)
             throws TikaException, SAXException, IOException {
 
@@ -251,7 +251,7 @@ public class PackageParser extends AbstractParser {
     }
 
     private void parseZipFile(InputStream stream, XHTMLContentHandler xhtml, ParseContext context,
-            TemporaryResources tmp, HashSet<String> parentMap, List<String> zipSubitemList, boolean isCarved,
+            TemporaryResources tmp, HashSet<String> parentMap, Set<String> zipSubitemList, boolean isCarved,
             BooleanWrapper encrypted, String encoding) throws IOException, SAXException, TikaException {
 
         try (InputStream is = getNewInputStream(new CloseShieldInputStream(stream), context);
