@@ -287,6 +287,15 @@ public class VideoThumbTask extends ThumbTask {
     public void finish() throws Exception {
         synchronized (finished) {
             if (taskEnabled && !finished.get()) {
+                for (VideoProcessResult r : processedVideos.values()) {
+                    if (r != null) {
+                        try {
+                            r.close();
+                        } catch (IOException e) {
+                            logger.warn("Error closing VideoProcessResult", e);
+                        }
+                    }
+                }
                 processedVideos.clear();
                 finished.set(true);
 
@@ -349,25 +358,27 @@ public class VideoThumbTask extends ThumbTask {
 
         // TODO: update this results reusage logic to work when frames as subitems is
         // enabled
-        if (!videoConfig.getVideoThumbsSubitems()) {
-            synchronized (processedVideos) {
-                if (processedVideos.containsKey(evidence.getHash())) {
-                    while (processedVideos.get(evidence.getHash()) == null) {
-                        processedVideos.wait();
-                    }
-                    VideoProcessResult r = processedVideos.get(evidence.getHash());
-                    evidence.setExtraAttribute(HAS_THUMB, r.isSuccess());
-                    if (r.isSuccess()) {
-                        saveMetadata(r, evidence.getMetadata());
-                        evidence.setHasPreview(true);
-                        evidence.setPreviewExt(PREVIEW_EXT);
+        synchronized (processedVideos) {
+            if (processedVideos.containsKey(evidence.getHash())) {
+                while (processedVideos.get(evidence.getHash()) == null) {
+                    processedVideos.wait();
+                }
+                VideoProcessResult r = processedVideos.get(evidence.getHash());
+                evidence.setExtraAttribute(HAS_THUMB, r.isSuccess());
+                if (r.isSuccess()) {
+                    saveMetadata(r, evidence.getMetadata());
+                    evidence.setHasPreview(true);
+                    evidence.setPreviewExt(PREVIEW_EXT);
+                    if (videoConfig.getVideoThumbsSubitems()) {
+                        generateSubitems(evidence, mainConfig, r.getFrames(), r.getDimension());
+                    } else {
                         File thumbFile = getThumbFile(evidence);
                         hasThumb(evidence, thumbFile);
                     }
-                    return;
                 }
-                processedVideos.put(evidence.getHash(), null);
+                return;
             }
+            processedVideos.put(evidence.getHash(), null);
         }
 
         PreviewRepository previewRepo = PreviewRepositoryManager.get(output);
@@ -378,12 +389,6 @@ public class VideoThumbTask extends ThumbTask {
         VideoProcessResult r = null;
         try {
 
-            // if preview exists and subitems are disabled, reuse previous result
-            if (previewExists && !videoConfig.getVideoThumbsSubitems()) {
-                synchronized (processedVideos) {
-                    r = processedVideos.get(evidence.getHash());
-                }
-            }
             if (r == null) {
                 mainTmpFile = Files.createTempFile("video-thumbs", ".jpg");
                 mainConfig.setOutFile(mainTmpFile.toFile());
@@ -488,21 +493,18 @@ public class VideoThumbTask extends ThumbTask {
                 }
             }
 
-            if (!videoConfig.getVideoThumbsSubitems()) {
-                // store processing result to be reused
-                synchronized (processedVideos) {
-                    processedVideos.put(evidence.getHash(), r);
-                    processedVideos.notifyAll();
-                }
+            synchronized (processedVideos) {
+                processedVideos.put(evidence.getHash(), r);
+                processedVideos.notifyAll();
             }
 
             if (mainTmpFile != null) {
                 Files.deleteIfExists(mainTmpFile);
             }
 
-            // TODO: this deletes temp frames, so the logic to reuse frames from
-            // duplicated videos should be updated
-            r.close();
+            if (!videoConfig.getVideoThumbsSubitems()) {
+                r.close();
+            }
 
         }
     }
