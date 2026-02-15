@@ -321,6 +321,7 @@ public class VideoProcessResult implements Closeable {
                 }
             }
             subTmp.delete();
+            subTmp = null;
         }
     }
 
