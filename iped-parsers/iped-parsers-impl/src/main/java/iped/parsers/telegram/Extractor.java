@@ -498,8 +498,7 @@ public class Extractor {
                                 if (cont.getPhone() != null)
                                     searchAvatarFileName(cont, cont.getPhotos());
                             } catch (IOException e) {
-                                // TODO: handle exception
-                                e.printStackTrace();
+                                logger.error("Error searching for avatar file", e);
                             }
                         }
                     }
@@ -537,8 +536,7 @@ public class Extractor {
                                 if (cont.getPhone() != null)
                                     searchAvatarFileName(cont, cont.getPhotos());
                             } catch (IOException e) {
-                                // TODO: handle exception
-                                e.printStackTrace();
+                                logger.error("Error searching for avatar file", e);
                             }
                         }
                     }
