@@ -6,6 +6,7 @@ import iped.app.ui.AppMain;
 public class BootstrapUI extends Bootstrap {
 
     public static void main(String args[]) {
+        System.setProperty("java.net.useSystemProxies", "true"); // fix for #1446
         new BootstrapUI().run(args);
     }
 
