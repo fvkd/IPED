@@ -49,6 +49,7 @@ public class Bootstrap {
     private static volatile File subProcessTempFolder;
 
     public static void main(String args[]) {
+        System.setProperty("java.net.useSystemProxies", "true"); // fix for #1446
         new Bootstrap().run(args);
     }
 
