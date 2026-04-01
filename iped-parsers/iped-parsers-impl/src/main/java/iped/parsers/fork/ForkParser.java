@@ -465,8 +465,7 @@ public class ForkParser extends AbstractParser {
         } else if (loader != null && parser == null && tikaBin != null && parserFactoryFactory != null) {
             return new ForkClient(tikaBin, pluginDir, parserFactoryFactory, loader, java, timeoutLimits);
         } else {
-            // TODO: make this more useful
-            throw new IllegalStateException("Unexpected combination of state items");
+            throw new IllegalStateException("Unexpected combination of state items: loader=" + loader + ", parser=" + parser + ", tikaBin=" + tikaBin + ", parserFactoryFactory=" + parserFactoryFactory);
         }
     }
 
